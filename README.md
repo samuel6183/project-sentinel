@@ -155,3 +155,21 @@ python -m sentinel.advanced --rows 100000 --seed 42
 ```
 
 Outputs: `outputs/advanced_model_comparison.csv` and `outputs/advanced_model_protocol.json`. This is a simulated experiment, not validated fraud detection.
+
+### V2 executed results — 26 November 2026
+
+[Successful research run](https://github.com/samuel6183/project-sentinel/actions/runs/45852666019) · [Download research artifact](https://github.com/samuel6183/project-sentinel/actions/runs/45852666019/artifacts/15133963633) (expires 24 February 2027; sign-in may be required).
+
+100,000 synthetic attempts, seed 42; chronological train/calibration/validation/test partitions: 60,000/10,000/10,000/20,000. Test positives: 370 (1.85%). Review cost KES 25, missed-positive cost KES 1,000, validation alert capacity 5%. These costs are assumptions.
+
+| Model | Validation cost (KES) | Test ROC-AUC | Test average precision | Test precision | Test recall | Test alerts | TP | FP | FN | Test cost (KES) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Logistic regression | 170,050 | .664757 | .041607 | .072650 | .045946 | 234 | 17 | 217 | 353 | 358,850 |
+| Random forest | 167,875 | .645212 | .035221 | .051107 | .081081 | 587 | 30 | 557 | 340 | 354,675 |
+| XGBoost | 169,250 | .667769 | .039567 | .056604 | .129730 | 848 | 48 | 800 | 322 | 343,200 |
+| Isolation forest | 170,575 | .605237 | .033615 | .041575 | .102703 | 914 | 38 | 876 | 332 | 354,850 |
+| No-alert baseline | 175,000 | .500000 | .018500 | 0 | 0 | 0 | 0 | 0 | 370 | 370,000 |
+
+Random Forest is the validation-selected champion. XGBoost has the lowest observed test cost (KES 26,800 or 7.24% below the no-alert baseline), but selecting it on the test set would introduce selection bias. It is a candidate for a new independent experiment, not a replacement champion yet. Logistic regression has the highest average precision. All models have low precision and recall at their selected thresholds. The validation champion reduces hypothetical test cost by KES 15,325 (4.14%). No production fraud performance or actual financial savings are established.
+
+Workflow tests, advanced comparison, notebook execution and artifact upload succeeded. Metrics were checked against execution logs; costs and confusion counts reconcile arithmetically, but the dataset was not independently rerun or audited. The previous experiment used the same synthetic seed, so this is exploratory rather than independent external validation. Next: independent seed holdout, rolling-origin validation, uncertainty intervals and cost sensitivity.
