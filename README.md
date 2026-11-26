@@ -183,3 +183,7 @@ Ten new simulation seeds, four expanding chronological folds per seed, paired mo
 ```bash
 python -m sentinel.reliability --rows 100000
 ```
+
+### Reliability dashboard
+
+The Streamlit app now supports importing the V3 seed summary and paired-cost contrast CSVs from a completed reliability artifact (or reading local outputs). It displays scenario-specific savings with uncertainty intervals, model metrics and paired cost comparisons. No placeholder V3 results are presented. Run `streamlit run app.py` locally; hosted deployment remains unconfirmed.
