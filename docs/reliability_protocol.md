@@ -1,0 +1,11 @@
+# Sentinel V3: pre-specified reliability protocol
+
+Purpose: quantify whether the V2 observed XGBoost advantage over the validation-selected Random Forest replicates, rather than optimize to the previously observed seed 42.
+
+Ten independent seeds (101, 211, 307, 401, 503, 601, 701, 809, 907, 1009), 100,000 synthetic transactions each. Four expanding-origin folds per seed, with contiguous disjoint fit, calibration, threshold-validation and test periods in each fold. Test periods are nonoverlapping within a seed; earlier test periods may enter later training windows as in realistic sequential retraining. The last decile is unused under the fixed fold schedule. All timestamp groups remain intact. Model configurations are frozen to V2.
+
+Primary endpoint: paired difference in test hypothetical cost per 1,000 transactions (XGBoost minus Random Forest), at review cost KES 25, missed-positive cost KES 1,000 and validation capacity 5%. Negative favors XGBoost. Report mean and approximate 95% t interval across ten independent seed averages, not across correlated folds or transactions. If the interval crosses zero, do not claim a reliable difference. Also compare savings relative to no alert, discrimination, calibration, recall, precision and alert burden.
+
+Sensitivity: one-at-a-time alternative review costs (10, 50), missed-positive costs (500, 2000) and validation alert capacities (2%, 10%). Rechoose thresholds exclusively on validation for each scenario. Alternative label mechanism applied only to final test fold as an explicit distribution-shift stress case. The stress scenario is reported separately and is not a claim of realistic fraud drift. Scenario intervals are exploratory and unadjusted for multiple comparisons. Fixed thresholds can exceed capacity in a test period; measure actual workload.
+
+The experiment compares procedures with repeated retraining, not the performance of a single fixed deployed model. Seeds vary Monte Carlo samples from the same fictional mechanism, not independent real populations. Confidence intervals characterize simulation variability, not external validity. No customer data, real fraud labels, observed costs or production claims. No model is promoted on the basis of this protocol alone.

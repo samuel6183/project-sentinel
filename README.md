@@ -173,3 +173,13 @@ Outputs: `outputs/advanced_model_comparison.csv` and `outputs/advanced_model_pro
 Random Forest is the validation-selected champion. XGBoost has the lowest observed test cost (KES 26,800 or 7.24% below the no-alert baseline), but selecting it on the test set would introduce selection bias. It is a candidate for a new independent experiment, not a replacement champion yet. Logistic regression has the highest average precision. All models have low precision and recall at their selected thresholds. The validation champion reduces hypothetical test cost by KES 15,325 (4.14%). No production fraud performance or actual financial savings are established.
 
 Workflow tests, advanced comparison, notebook execution and artifact upload succeeded. Metrics were checked against execution logs; costs and confusion counts reconcile arithmetically, but the dataset was not independently rerun or audited. The previous experiment used the same synthetic seed, so this is exploratory rather than independent external validation. Next: independent seed holdout, rolling-origin validation, uncertainty intervals and cost sensitivity.
+
+## V3 reliability replication
+
+[Pre-specified research protocol](docs/reliability_protocol.md) · [Reliability workflow](https://github.com/samuel6183/project-sentinel/actions/workflows/reliability.yml)
+
+Ten new simulation seeds, four expanding chronological folds per seed, paired model cost comparisons, approximate seed-level uncertainty intervals, seven pre-specified cost/capacity scenarios, and a separate held-out label-mechanism stress test. Earlier V1/V2 results are retained. V3 results are pending execution; no superiority claim has been made.
+
+```bash
+python -m sentinel.reliability --rows 100000
+```

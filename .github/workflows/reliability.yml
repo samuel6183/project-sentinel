@@ -1,0 +1,29 @@
+name: Sentinel V3 reliability replication
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'sentinel/reliability.py'
+      - 'tests/test_reliability.py'
+      - '.github/workflows/reliability.yml'
+permissions:
+  contents: read
+jobs:
+  replication:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python -m sentinel.reliability --rows 100000
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sentinel-v3-reliability
+          path: outputs/v3_*
+          if-no-files-found: error
+          retention-days: 90
