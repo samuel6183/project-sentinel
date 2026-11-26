@@ -1,0 +1,29 @@
+name: Sentinel V4 confirmation and explainability
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'sentinel/confirmation.py'
+      - 'tests/test_confirmation.py'
+      - '.github/workflows/confirmation.yml'
+permissions:
+  contents: read
+jobs:
+  confirmation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python -m sentinel.confirmation --rows 100000
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sentinel-v4-confirmation
+          path: outputs/v4_*
+          if-no-files-found: error
+          retention-days: 90

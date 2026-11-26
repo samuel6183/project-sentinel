@@ -178,7 +178,7 @@ Workflow tests, advanced comparison, notebook execution and artifact upload succ
 
 [Pre-specified research protocol](docs/reliability_protocol.md) · [Reliability workflow](https://github.com/samuel6183/project-sentinel/actions/workflows/reliability.yml)
 
-Ten new simulation seeds, four expanding chronological folds per seed, paired model cost comparisons, approximate seed-level uncertainty intervals, seven pre-specified cost/capacity scenarios, and a separate held-out label-mechanism stress test. Earlier V1/V2 results are retained. V3 results are pending execution; no superiority claim has been made.
+Ten new simulation seeds, four expanding chronological folds per seed, paired model cost comparisons, approximate seed-level uncertainty intervals, seven pre-specified cost/capacity scenarios, and a separate held-out label-mechanism stress test. Earlier V1/V2 results are retained. V3 results are documented below; no universal superiority claim has been made.
 
 ```bash
 python -m sentinel.reliability --rows 100000
@@ -215,3 +215,13 @@ Primary pre-specified paired contrast (XGBoost minus Random Forest, KES per 1,00
 | Capacity 10% | -433.43 | [-680.94, -185.92] | -340.49 | [-694.19, 13.21] |
 
 Sensitivity intervals are exploratory and not adjusted for multiplicity. Logistic regression had the lowest observed average baseline cost, but its 23.19 KES difference from XGBoost has not been tested with a paired interval. No global champion is promoted. All models miss most simulated positives; no external or production validation is established. Results transcribed from successful workflow logs; underlying CSVs have not been independently recomputed. For stronger evidence, use fresh simulation seeds with a pre-specified logistic-regression versus XGBoost contrast and evaluate matched final-fold conditions, followed by legitimate external data if available.
+
+## V4 independent confirmation and explainability
+
+[Pre-specified V4 protocol](docs/confirmation_protocol.md) · [Confirmation workflow](https://github.com/samuel6183/project-sentinel/actions/workflows/confirmation.yml)
+
+Twenty new independent seeds (2 million generated synthetic attempts), fixed final chronological test windows, paired XGBoost versus logistic regression cost comparison, matched label-shift stress test, calibration curves, raw-log-odds feature attributions and PSI drift diagnostics. Results pending execution. Prior V1–V3 results remain intact.
+
+```bash
+python -m sentinel.confirmation --rows 100000
+```
