@@ -1,0 +1,36 @@
+name: Generate full synthetic research outputs
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'sentinel/**'
+      - 'notebooks/**'
+      - '.github/workflows/research.yml'
+permissions:
+  contents: read
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt jupyter nbconvert
+      - run: python -m unittest discover -s tests -v
+      - run: python -m sentinel.pipeline --rows 100000 --seed 42
+      - run: python -m sentinel.report
+      - run: jupyter nbconvert --to notebook --execute notebooks/sentinel_analysis.ipynb --output executed_sentinel.ipynb --ExecutePreprocessor.timeout=600
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sentinel-research-results
+          path: |
+            data/transactions.csv
+            data/transactions.sqlite3
+            outputs/*.csv
+            outputs/*.json
+            outputs/*.png
+            outputs/executive_summary.md
+            notebooks/executed_sentinel.ipynb
+          retention-days: 90
