@@ -187,3 +187,31 @@ python -m sentinel.reliability --rows 100000
 ### Reliability dashboard
 
 The Streamlit app now supports importing the V3 seed summary and paired-cost contrast CSVs from a completed reliability artifact (or reading local outputs). It displays scenario-specific savings with uncertainty intervals, model metrics and paired cost comparisons. No placeholder V3 results are presented. Run `streamlit run app.py` locally; hosted deployment remains unconfirmed.
+
+### V3 executed reliability results — 26 November 2026
+
+[Successful workflow](https://github.com/samuel6183/project-sentinel/actions/runs/45853644658) · [Download reliability outputs](https://github.com/samuel6183/project-sentinel/actions/runs/45853644658/artifacts/15134189936) (expires 24 February 2027; GitHub sign-in may be required).
+
+Ten fresh seeds, 100,000 generated transactions per seed, four rolling test windows per seed. Baseline: KES 25 review cost, KES 1,000 missed-positive cost, 5% validation capacity. Results are means across seed-level fold averages, not a single million-row test set.
+
+| Model | Cost per 1,000 (KES) | Savings per 1,000 (KES) | 95% savings interval | Average precision | Recall | Alert rate |
+| --- | ---: | ---: | --- | ---: | ---: | ---: |
+| Logistic regression | 15,921.63 | 1,308.31 | [1,171.92, 1,444.70] | 3.97% | 14.15% | 4.53% |
+| XGBoost | 15,944.82 | 1,285.12 | [1,064.72, 1,505.52] | 3.71% | 13.82% | 4.35% |
+| Random forest | 16,385.45 | 844.50 | [681.40, 1,007.59] | 3.33% | 11.25% | 4.34% |
+| Isolation forest | 16,450.76 | 779.19 | [639.75, 918.63] | 3.12% | 10.50% | 4.13% |
+| No-alert baseline | 17,229.94 | 0 | [0, 0] | 1.72% | 0% | 0% |
+
+Primary pre-specified paired contrast (XGBoost minus Random Forest, KES per 1,000): **-440.62**, approximate 95% CI [-585.90, -295.34]. The simulated baseline cost advantage replicates. Under the alternative held-out label mechanism the contrast is -145.75, CI [-465.15, 173.66]; inconclusive. The stress comparison uses only the final fold per seed. Do not compare stress and all-fold averages as a causal drift effect.
+
+| Scenario | Same-mechanism paired difference | 95% interval | Stress paired difference | 95% interval |
+| --- | ---: | --- | ---: | --- |
+| Baseline | -440.62 | [-585.90, -295.34] | -145.75 | [-465.15, 173.66] |
+| Review 10 | -440.10 | [-593.51, -286.69] | -87.30 | [-395.83, 221.22] |
+| Review 50 | -163.87 | [-303.46, -24.28] | 5.00 | [-231.19, 241.19] |
+| Miss 500 | -81.94 | [-151.73, -12.14] | 2.50 | [-115.59, 120.59] |
+| Miss 2,000 | -890.87 | [-1,212.15, -569.59] | -136.50 | [-789.01, 516.00] |
+| Capacity 2% | -129.75 | [-260.36, 0.85] | -13.00 | [-147.52, 121.52] |
+| Capacity 10% | -433.43 | [-680.94, -185.92] | -340.49 | [-694.19, 13.21] |
+
+Sensitivity intervals are exploratory and not adjusted for multiplicity. Logistic regression had the lowest observed average baseline cost, but its 23.19 KES difference from XGBoost has not been tested with a paired interval. No global champion is promoted. All models miss most simulated positives; no external or production validation is established. Results transcribed from successful workflow logs; underlying CSVs have not been independently recomputed. For stronger evidence, use fresh simulation seeds with a pre-specified logistic-regression versus XGBoost contrast and evaluate matched final-fold conditions, followed by legitimate external data if available.
