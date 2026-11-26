@@ -86,8 +86,9 @@ Approval and failure denominators are all attempted transactions, including pend
 - [x] Implemented reproducible generator, SQL database pipeline and operational metrics
 - [x] Implemented Random Forest and Isolation Forest evaluation
 - [x] Implemented interactive dashboard and automated test definitions
-- [ ] Verify CI, execute full-size pipeline and publish verified sample outputs
-- [ ] Add exploratory notebook and hosted dashboard
+- [x] Verify CI and execute full-size pipeline; publish downloadable research artifact
+- [x] Add and execute exploratory notebook
+- [ ] Host public dashboard
 
 **Author:** [Samuel Ndungu Njoroge](https://github.com/samuel6183) · [LinkedIn](https://www.linkedin.com/in/samuel-ndungu-6800b8194/)
 
@@ -104,3 +105,43 @@ python -m sentinel.report
 ```
 
 For dashboard hosting on Streamlit Community Cloud, select this public repository, branch main and entry point app.py. Hosting requires an authorized Streamlit account; no hosted dashboard is claimed yet.
+
+## Executed research results
+
+Verified from the [successful research workflow](https://github.com/samuel6183/project-sentinel/actions/runs/45851888651), 26 November 2026 (100,000 synthetic attempts, seed 42).
+
+| Metric | Observed result |
+| --- | ---: |
+| Transaction attempts | 100,000 |
+| Gross attempted volume (KES) | 329,143,635.31 |
+| Approval rate | 88.16% |
+| Failure rate | 8.41% |
+| Pending rate | 3.43% |
+| Settlement exceptions | 684 |
+| Absolute settlement discrepancy (KES) | 42,480.00 |
+
+| Fictional provider | Attempts | Approval rate | Failure rate | P95 processing seconds | Absolute discrepancy (KES) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| PSP-A | 34,857 | 90.89% | 5.71% | 47.72 | 14,340.00 |
+| PSP-B | 30,117 | 88.36% | 8.18% | 51.74 | 14,120.00 |
+| PSP-C | 22,013 | 86.22% | 10.35% | 56.95 | 9,860.00 |
+| PSP-D | 13,013 | 83.70% | 12.87% | 61.53 | 4,160.00 |
+
+### Model evaluation
+
+Chronological split: 80,000 training observations and 20,000 holdout observations; holdout synthetic label prevalence: 1.85%.
+
+| Metric | Result |
+| --- | ---: |
+| Random Forest ROC-AUC | 0.6490 |
+| Random Forest average precision | 0.0371 |
+| Random Forest precision (threshold 0.5) | 0.0320 |
+| Random Forest recall (threshold 0.5) | 0.4919 |
+| Random Forest F1 (threshold 0.5) | 0.0601 |
+| Isolation Forest average precision | 0.0334 |
+
+The model shows limited discrimination and low precision. Threshold 0.5 produces many false positives. These are simulated outcomes, not real fraud findings or estimates of any actual provider's performance. Future work includes time-aware validation, probability calibration, and cost-sensitive threshold selection on separate validation data.
+
+### Download research outputs
+
+[Download the workflow artifact](https://github.com/samuel6183/project-sentinel/actions/runs/45851888651/artifacts/15133927853) (GitHub sign-in may be required; expires 24 February 2027). Contains the generated dataset, SQLite database, metrics, charts, executed notebook and report. Workflow tests, pipeline execution, report generation, notebook execution and artifact upload all succeeded. Metrics above were checked against execution logs, not independently recomputed from the artifact.
