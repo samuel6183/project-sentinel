@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.streamlit/secrets.toml
+data/*.csv
+data/*.sqlite3
+outputs/*.csv
+outputs/*.json
+outputs/*.png
