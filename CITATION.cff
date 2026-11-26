@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this research, please cite the working paper."
+title: "Financial Transaction Risk Intelligence: A Comparative Study of Statistical and Machine Learning Models Using Cost-Sensitive Evaluation, Explainable AI and Temporal Robustness Analysis"
+authors:
+  - family-names: "Ndungu Njoroge"
+    given-names: "Samuel"
+version: "1.0"
+date-released: "2026-11-26"
+repository-code: "https://github.com/samuel6183/project-sentinel"
+url: "https://github.com/samuel6183/project-sentinel/tree/main/research"
+keywords:
+  - payment analytics
+  - synthetic data
+  - cost-sensitive learning
+  - temporal validation
+  - explainable AI

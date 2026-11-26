@@ -220,8 +220,16 @@ Sensitivity intervals are exploratory and not adjusted for multiplicity. Logisti
 
 [Pre-specified V4 protocol](docs/confirmation_protocol.md) · [Confirmation workflow](https://github.com/samuel6183/project-sentinel/actions/workflows/confirmation.yml)
 
-Twenty new independent seeds (2 million generated synthetic attempts), fixed final chronological test windows, paired XGBoost versus logistic regression cost comparison, matched label-shift stress test, calibration curves, raw-log-odds feature attributions and PSI drift diagnostics. Results pending execution. Prior V1–V3 results remain intact.
+Twenty new independent seeds (2 million generated synthetic attempts), fixed final chronological test windows, paired XGBoost versus logistic regression cost comparison, matched label-shift stress test, calibration curves, raw-log-odds feature attributions and PSI drift diagnostics. Execution completed; see results and manuscript below. Prior V1–V3 results remain intact.
 
 ```bash
 python -m sentinel.confirmation --rows 100000
 ```
+
+### V4 confirmed results
+
+The [V4 workflow](https://github.com/samuel6183/project-sentinel/actions/runs/45854541752) completed successfully. Across 20 fresh seeds, XGBoost minus Logistic Regression hypothetical cost per 1,000 attempts was KES 216.00 (95% CI 26.16–405.84) under the original mechanism and −KES 4.00 (95% CI −177.54–169.54) under matched label shift. These are conditional simulation findings, not production evidence. [V4 artifact](https://github.com/samuel6183/project-sentinel/actions/runs/45854541752/artifacts/15134992738).
+
+## Research publication
+
+[Read the full working paper and suggested citation](research/README.md). Published as a plain-text transcription of the nine-page manuscript, version 1.0, 26 November 2026. Not peer reviewed; no DOI assigned. The original formatted PDF remains to be uploaded.

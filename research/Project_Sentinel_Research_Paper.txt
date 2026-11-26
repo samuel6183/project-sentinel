@@ -1,0 +1,418 @@
+PROJECT SENTINEL — WORKING PAPER, VERSION 1.0
+Text extracted from the original nine-page PDF. Tables retain text layout; mathematical glyphs may differ from the formatted PDF. Not peer reviewed.
+
+Financial Transaction Risk Intelligence: A Comparative
+ Study of Statistical and Machine Learning Models Using
+ Cost-Sensitive Evaluation, Explainable AI and Temporal
+                    Robustness Analysis
+                                           Samuel Ndungu Njoroge
+                           Independent research | Project Sentinel | 26 November 2026
+                                     Working paper — not peer reviewed
+
+ Abstract
+ Financial transaction monitoring involves a trade-off between detecting rare adverse events and managing
+ investigation costs. This study develops Project Sentinel, a reproducible synthetic payment analytics
+ framework, to compare Logistic Regression, Random Forest, XGBoost and Isolation Forest using
+ chronological validation, probability calibration, cost-sensitive threshold selection and independent Monte
+ Carlo replication. Four sequential experiments use 31 distinct simulation seeds, each generating 100,000
+ fictional payment attempts (3.1 million generated records across distinct datasets; the initial dataset is reused
+ in stages I and II). Stage III evaluates four rolling test windows per seed across ten fresh seeds; stage IV
+ compares Logistic Regression and XGBoost across twenty additional seeds using matched original and
+ alternative label mechanisms. Under baseline hypothetical costs, stage III finds that XGBoost costs KES
+ 440.62 less per 1,000 attempts than Random Forest (95% CI: 295.34–585.90 less). Stage IV finds XGBoost
+ costs KES 216.00 more than Logistic Regression (95% CI: 26.16–405.84 more), whereas the difference under
+ the alternative mechanism is inconclusive (−4.00; 95% CI: −177.54–169.54). Calibration improves Brier
+ scores substantially; recent transaction count is the largest mean absolute raw-log-odds attribution in both final
+ models. The results support conditional, not universal, advantages of simpler statistical models. Low recall
+ and simulated labels preclude production fraud claims. The framework contributes a transparent experimental
+ approach to evaluating payment risk models under operational constraints.
+ Keywords: payment operations; synthetic data; cost-sensitive learning; temporal validation; probability
+ calibration; explainable AI; financial risk.
+
+ 1. Introduction
+ Digital payment systems generate transaction attempts, processing outcomes and settlement records that can
+ support operational monitoring. Risk classification poses a distinct challenge: positive events may be rare,
+ alerts consume investigative capacity, and missed positives have consequences. A model with a strong ranking
+ metric may nevertheless be expensive to operate at a poorly chosen threshold. Sentinel separates operational
+ measurement from experimental risk prediction and evaluates the latter through explicit financial assumptions.
+ The research asks whether model complexity produces a repeatable economic advantage after calibration and
+ chronological validation, and whether that advantage persists under a changed synthetic risk mechanism. The
+ study is a simulation experiment, not an empirical estimate of fraud in Kenya or any named payment provider.
+
+
+
+
+
+
+ 2. Literature and analytical foundation
+ Random Forest aggregates randomized trees to capture nonlinear patterns (Breiman, 2001). XGBoost uses
+ scalable gradient-boosted trees (Chen & Guestrin, 2016). Logistic Regression provides a lower-complexity
+ conditional probability benchmark; Isolation Forest provides an anomaly-scoring alternative. These model
+ families serve different purposes, so their comparison must account for class imbalance and the intended
+ decision policy rather than accuracy alone.
+ Saito and Rehmsmeier (2015) show why precision–recall analysis is particularly informative for imbalanced
+ classification. Average precision (AP) summarizes ranking performance over recall levels and is interpreted
+ relative to positive prevalence. ROC-AUC remains a complementary measure of discrimination but does not
+ directly express alert quality at a selected threshold. Niculescu-Mizil and Caruana (2005) demonstrate the
+ importance of evaluating and calibrating probability estimates; Sentinel consequently distinguishes probability
+ quality from ranking and threshold-specific performance.
+ Lundberg and Lee (2017) introduce SHAP as a framework for assigning feature contributions to predictions.
+ Here explanations are used to examine whether the final models consistently attribute importance to simulated
+ behavioural signals, rather than establish causal relationships. The present study integrates these established
+ methods with an explicit review-cost objective and repeated chronological simulation. It does not claim to
+ introduce a new machine learning algorithm or establish a gap through an exhaustive systematic review.
+
+ 3. Research objectives and hypotheses
+ The study has four objectives: (1) construct a reproducible synthetic payment operations dataset and quantify
+ provider and settlement metrics; (2) compare statistical and machine learning models using temporally
+ separated fitting, calibration, threshold selection and testing; (3) quantify the reliability of economic
+ comparisons across fresh simulation seeds and alternative assumptions; and (4) assess calibration, feature
+ attribution stability and robustness under an alternative risk mechanism.
+ The pre-specified stage III contrast is the mean test cost of XGBoost minus Random Forest, normalized per
+ 1,000 attempts. The stage IV primary contrast is XGBoost minus Logistic Regression under the original
+ synthetic mechanism. The null hypothesis for each paired contrast is a zero mean difference; the alternative is
+ nonzero. A negative difference favours XGBoost. A two-sided approximate 95% Student t interval is
+ calculated across independent seed-level differences. A stage IV descriptive practical-similarity margin of
+ ±KES 250 per 1,000 is analyst-chosen, not a formally approved equivalence bound.
+
+ 4. Methodology
+ 4.1 Design and data generation
+ The study uses sequential quantitative Monte Carlo experiments. Each dataset contains 100,000 fictional
+ payment attempts with simulated timestamps in 2025, four fictional PSPs, three payment methods, deposits
+ and withdrawals, KES amounts, account age, attempts, recent transaction counts, processing time, status and
+ settlement values. Transaction amounts are sampled from a clipped lognormal distribution; retry and velocity
+ variables are Poisson-based. Provider-specific failure probabilities and simplified settlement deviations are
+ generated separately from the risk labels. All data are synthetic.
+
+
+
+
+
+
+ 4.2 Synthetic label mechanism and features
+ The original binary risk label is sampled from a Bernoulli distribution with probability given by the logistic
+ transformation of the following simulated score:
+ z = −5.4 + 0.30v + 0.85I(a < 30) + 0.80I(r > 3) + 0.70I(m > 15,000) + ε, where ε ~ N(0, 0.8²), v denotes recent
+ transaction count, a account age in days, r attempt count, and m transaction amount. I(.) is an indicator
+ function. The alternative stress mechanism uses z = −4.9 + 0.15v + 0.40I(a < 30) + 0.40I(r > 3) + 0.35I(m >
+ 15,000) + 0.80I(withdrawal) + ε, with ε ~ N(0, 1²). The stress mechanism is deliberately illustrative and does
+ not represent observed fraud drift.
+ Stage I uses amount, attempt count, account age and recent transaction count. Subsequent stages add log(1 +
+ amount), a new-account indicator and the product of attempt count and recent transaction count. Settlement,
+ transaction outcome and risk label are excluded from model inputs. This avoids direct outcome leakage in the
+ simulated design; actual availability of retry and recent-transaction features at a decision timestamp would
+ need verification before real deployment.
+ 4.3 Experimental stages
+  Stage       Dataset(s)                       Temporal design                                   Purpose
+
+  I           Seed 42; 100,000                 80% train / 20% test                              Operational baseline; fixed 0.5
+                                                                                                 threshold
+
+  II          Seed 42 reused                   60/10/10/20% fit, calibrate, validate, test       Four-model exploratory comparison
+
+  III         10 fresh seeds; 1 million        Four expanding folds; final four deciles tested   Paired replication and seven cost
+              generated                                                                          scenarios
+
+  IV          20 fresh seeds; 2 million        70/10/10/10% fit, calibrate, validate, test       Fresh paired LR–XGBoost
+              generated                                                                          confirmation
+
+ Table 1. Experimental design. Generated totals are not test-set sizes. Timestamp groups are preserved in stages II–IV.
+
+ Stage III uses seed values 101, 211, 307, 401, 503, 601, 701, 809, 907 and 1009. Training expands from four
+ to seven deciles, followed by a calibration decile, validation decile and test decile. The four test periods do not
+ overlap within each seed. Stage IV uses seeds 2001–2020 and only the final test decile. The original and
+ alternative labels are evaluated on identical test features and predictions in stage IV. Seed 42 is excluded from
+ both replication experiments.
+ 4.4 Models and calibration
+ Logistic Regression uses standardized features, balanced class weights and a maximum of 1,000 iterations.
+ Random Forest uses 100 trees, depth 10, minimum leaf size 15 and balanced class weights. XGBoost uses 150
+ trees, depth 3, learning rate 0.05, row and column subsampling 0.85 and a training negative-to-positive weight
+ ratio. Isolation Forest uses 100 trees and is fitted without labels; its anomaly score is subsequently calibrated
+ using labelled calibration observations. Each model uses random state 42. In stages II–IV a separate logistic
+ mapping calibrates the model score using a disjoint chronological calibration set.
+
+
+
+
+
+
+ 4.5 Cost-sensitive decision policy and inference
+ Let TP, FP and FN denote true positives, false positives and false negatives. The hypothetical decision loss is
+ L = c■(TP + FP) + c■FN. The baseline assumes review cost c■ = KES 25 and missed-positive cost c■ =
+ KES 1,000. The no-alert policy incurs c■ times the number of positives. The validation threshold minimizes
+ loss subject to at most 5% of validation attempts being alerted; all tied scores are treated together. In stages III
+ and IV, zero selected alerts becomes an explicit no-alert policy. The validation constraint does not guarantee
+ identical test workload.
+ The study reports normalized cost and savings per 1,000 attempts, AP, ROC-AUC, precision, recall, F1, alert
+ rate and probability diagnostics. Brier score is the mean squared difference between predicted probability and
+ binary label. For stage III, folds are averaged within seed before inference to avoid treating overlapping
+ training windows as independent. Stage IV computes paired differences on one final test period per seed. The
+ approximate interval is mean ± t(0.975, n−1) × sample standard deviation / √n. Sensitivity intervals are
+ exploratory and not multiplicity-adjusted.
+ Stage IV uses fixed probability bins for descriptive calibration curves, TreeSHAP raw-log-odds attributions
+ for XGBoost, and standardized linear independent-background attributions for Logistic Regression, using 256
+ fixed held-out examples per seed. Feature and score stability diagnostics use PSI with validation quantile bins
+ and count smoothing. No causal meaning is assigned to feature attributions. PSI cannot detect a change in
+ labels when features and scores remain unchanged.
+
+ 5. Results
+ 5.1 Stage I: operational intelligence and baseline models
+ The initial dataset generated 100,000 attempts and KES 329,143,635.31 in gross attempted volume. Approval,
+ failure and pending rates were 88.16%, 8.41% and 3.43%, respectively. There were 684 settlement exceptions,
+ with an absolute discrepancy of KES 42,480. These are simulated operational outcomes, not real provider
+ performance or revenue.
+
+  Provider                 Attempts                  Approval            Failure                 P95 seconds
+
+  PSP-A                    34,857                    90.89%              5.71%                   47.72
+
+  PSP-B                    30,117                    88.36%              8.18%                   51.74
+
+  PSP-C                    22,013                    86.22%              10.35%                  56.95
+
+  PSP-D                    13,013                    83.70%              12.87%                  61.53
+
+ Table 2. Fictional provider performance from stage I.
+
+ On the 20,000-attempt holdout (1.85% positives), the initial Random Forest obtained ROC-AUC 0.6490, AP
+ 0.0371, precision 0.0320, recall 0.4919 and F1 0.0601 at threshold 0.5. Isolation Forest AP was 0.0334. The
+ high false-alert burden motivated explicit capacity and cost modelling.
+
+
+
+
+
+
+ 5.2 Stage II: exploratory calibrated model comparison
+  Model                            ROC-AUC           AP               Alerts          TP          FN           Test cost (KES)
+
+  Logistic Regression              0.6648            0.0416           234             17          353          358,850
+
+  Random Forest                    0.6452            0.0352           587             30          340          354,675
+
+  XGBoost                          0.6678            0.0396           848             48          322          343,200
+
+  Isolation Forest                 0.6052            0.0336           914             38          332          354,850
+
+  No-alert                         0.5000            0.0185           0               0           370          370,000
+
+ Table 3. Stage II final test results. TP = true positives; FN = false negatives. Test set: 20,000 attempts.
+
+ Random Forest was selected before testing, with validation cost KES 167,875. XGBoost achieved the lowest
+ observed test cost, KES 343,200, representing KES 26,800 (7.24%) hypothetical savings against the no-alert
+ policy. This observed test ranking was treated as exploratory rather than used to retrospectively change the
+ validation-selected champion.
+ 5.3 Stage III: independent replication
+  Model                         Cost/1,000 (KES)      Savings/1,000         95% CI for savings            AP              Recall
+                                                      (KES)
+
+  Logistic Regression           15,921.63             1,308.31              1,171.92–1,444.70             3.97%           14.15%
+
+  XGBoost                       15,944.82             1,285.12              1,064.72–1,505.52             3.71%           13.82%
+
+  Random Forest                 16,385.45             844.50                681.40–1,007.59               3.33%           11.25%
+
+  Isolation Forest              16,450.76             779.19                639.75–918.63                 3.12%           10.50%
+
+  No-alert                      17,229.94             0                     0–0                           1.72%           0%
+
+ Table 4. Stage III baseline, ten independent seed averages. Values rounded from execution logs.
+
+ The primary paired XGBoost-minus-Random Forest cost difference was −KES 440.62 per 1,000 (95% CI
+ −585.90 to −295.34). This replicates the directional advantage under the original mechanism. Logistic
+ Regression had the lowest observed average cost, but the corresponding pairwise contrast with XGBoost was
+ not pre-specified at this stage. All four models had positive average hypothetical savings relative to no alert,
+ but recall remained low.
+ Under the alternative label mechanism, the XGBoost-minus-Random Forest contrast was −KES 145.75 (95%
+ CI −465.15 to 173.66), so an advantage was not established. This stress evaluation uses only the final rolling
+ fold; its results should not be directly compared with all-fold averages as a causal drift effect.
+
+
+
+
+
+
+ 5.4 Stage III: cost and capacity sensitivity
+  Scenario                  Original contrast      95% CI                            Stress contrast    95% CI
+
+  Baseline                  −440.62                [−585.90, −295.34]                −145.75            [−465.15, 173.66]
+
+  Review KES 10             −440.10                [−593.51, −286.69]                −87.30             [−395.83, 221.22]
+
+  Review KES 50             −163.87                [−303.46, −24.28]                 5.00               [−231.19, 241.19]
+
+  Miss KES 500              −81.94                 [−151.73, −12.14]                 2.50               [−115.59, 120.59]
+
+  Miss KES 2,000            −890.87                [−1,212.15, −569.59]              −136.50            [−789.01, 516.00]
+
+  Capacity 2%               −129.75                [−260.36, 0.85]                   −13.00             [−147.52, 121.52]
+
+  Capacity 10%              −433.43                [−680.94, −185.92]                −340.49            [−694.19, 13.21]
+
+ Table 5. Paired XGBoost minus Random Forest cost per 1,000 attempts in KES. Negative favours XGBoost. Exploratory
+ intervals are unadjusted.
+
+ Six of seven original-mechanism intervals exclude zero in favour of XGBoost, while the tighter 2% capacity
+ scenario is inconclusive. Every stress interval includes zero. The economic ranking therefore depends on both
+ assumptions and the data-generating process.
+ 5.5 Stage IV: fresh paired confirmation
+  Mechanism / model                             Cost/1,000           Savings/1,000          AP         Recall        Brier
+
+  Original / Logistic Regression                16,303.29            1,371.62               3.95%      14.38%        0.017236
+
+  Original / XGBoost                            16,519.29            1,155.62               4.00%      12.73%        0.017241
+
+  Stress / Logistic Regression                  23,673.26            836.62                 3.36%      8.23%         0.023946
+
+  Stress / XGBoost                              23,669.25            840.62                 3.44%      7.96%         0.023931
+
+ Table 6. Stage IV means across twenty fresh seeds. Costs and savings in KES per 1,000 attempts.
+
+ The primary contrast (XGBoost minus Logistic Regression) was +KES 216.00 (95% CI 26.16–405.84),
+ supporting lower mean cost for Logistic Regression under the original simulation. The interval is not entirely
+ within the analyst-chosen ±KES 250 similarity margin. Under matched alternative labels the difference was
+ −KES 4.00 (95% CI −177.54–169.54); superiority was inconclusive and the interval lies within the illustrative
+ margin. This is descriptive practical similarity, not a formal equivalence conclusion.
+
+
+
+
+
+
+ 6. Explainability, calibration and stability
+ Raw class-weighted scores were poorly calibrated as probabilities. Under the original mechanism, mean Brier
+ score declined from 0.228539 to 0.017236 for Logistic Regression and from 0.216671 to 0.017241 for
+ XGBoost. Under stress the corresponding changes were 0.230154 to 0.023946 and 0.218431 to 0.023931.
+ These reductions demonstrate the importance of calibration for this experiment, but calibrated scores remain
+ close to rare-event prevalence and do not establish clinical or financial usefulness.
+
+  Feature                                       Logistic Regression mean (SD)            XGBoost mean (SD)
+
+  Recent transaction count                      0.378925 (0.057672)                      0.251013 (0.027083)
+
+  Attempt count                                 0.182032 (0.053854)                      0.129650 (0.023092)
+
+  Retry intensity                               0.045329 (0.034089)                      0.184914 (0.035341)
+
+  Transaction amount                            0.067582 (0.022325)                      0.078957 (0.013768)
+
+  Account age                                   0.025100 (0.017769)                      0.077600 (0.015726)
+
+  Log amount                                    0.037989 (0.026659)                      0.024574 (0.005194)
+
+  New-account indicator                         0.027100 (0.009070)                      0.009577 (0.007124)
+
+ Table 7. Mean absolute raw-log-odds attributions and across-seed standard deviations, stage IV.
+
+ Recent transaction count was the largest mean attribution in both models. XGBoost assigned substantial
+ importance to retry intensity, while Logistic Regression gave relatively more attribution to attempt count.
+ Since these variables are correlated and enter the constructed label mechanism, the results are explanatory of
+ model behaviour rather than independent causal evidence. Attribution scales and background assumptions
+ differ between model families, so direct magnitude comparisons require caution.
+ The workflow generated calibration plots, attribution stability charts and PSI diagnostics. Numeric PSI
+ summaries were not exposed in the inspected execution logs, so no claim of detected or absent drift is made
+ here. The repository provides the corresponding artifact for inspection.
+
+ 7. Discussion
+ The four stages show why a single test ranking should not determine model selection. The V2 XGBoost
+ advantage over Random Forest survived V3 replication, yet the stronger V4 comparison favoured Logistic
+ Regression in mean cost under the original mechanism. This is plausible because the original labels are
+ generated from a relatively simple additive logistic score. A flexible learner may capture nonlinearities, but
+ additional complexity need not improve economic outcomes when signals are weak and review capacity is
+ restricted.
+ The stage IV stress test removes the statistically supported difference. Across the research, the strongest
+ observed baseline recall is still low at operational thresholds: V4 Logistic Regression detects only about 14%
+ of positives under the original mechanism. Thus even the better observed cost result is not a justification for
+ using the model as the sole transaction-control mechanism. Human review, business rules and independent
+ real-world assessment remain necessary.
+
+
+
+
+
+
+ 8. Limitations and implications
+ The fundamental limitation is external validity. All observations, provider identities, risk labels and costs are
+ simulated. The 31 distinct random seeds generate new draws from prescribed mechanisms rather than different
+ financial institutions or actual customer populations. The study therefore establishes Monte Carlo reliability
+ conditional on its generator and evaluation assumptions, not fraud prevalence, causal determinants, real
+ savings or actual PSP performance.
+ The cost function assumes constant costs per review and missed positive, without transaction-specific
+ exposure, recovery probability, investigation delay, staffing constraints or false-positive customer impacts. A
+ validation alert-rate constraint is not a guaranteed production capacity limit. The thresholds and the practical
+ similarity margin are analyst choices. The stress mechanism is one alternative label process, not a
+ representative model of adversarial behaviour. The seed-level t intervals are approximate; exploratory
+ comparisons are unadjusted for multiplicity.
+ Further limitations include the lack of customer-level clustering, real event ordering, independent label
+ adjudication, stakeholder-approved loss estimates, and a fully pinned execution environment. The manuscript
+ transcribes successfully completed GitHub workflow logs and repository protocols; underlying output files
+ have not been independently recomputed or audited for this manuscript. The dashboard exists as source code
+ but public deployment is not verified.
+ Future work should acquire appropriately authorised and de-identified transaction data, document label
+ provenance and feature availability, evaluate account-level and temporal leakage, estimate real review and loss
+ costs, and validate on a later independent period or institution. A pre-registered external comparison and
+ confidence intervals that account for clustering would strengthen claims. Monitoring should assess actual alert
+ workload, calibration degradation and outcome-based concept drift, rather than rely solely on PSI.
+
+ 9. Conclusion
+ Project Sentinel demonstrates a reproducible methodology for integrating payment operations analytics, model
+ comparison, cost-sensitive decisions, temporal validation and explainability. The pre-specified V3 comparison
+ supports a simulated XGBoost cost advantage over Random Forest; the fresh V4 comparison supports a
+ Logistic Regression cost advantage over XGBoost under the original mechanism, but neither dominates under
+ the alternative mechanism. The results argue for using simple baselines, calibrated probabilities, independent
+ replication and explicit operational cost assumptions before selecting complex machine learning models. No
+ model is established as universally superior or suitable for production fraud detection.
+
+ 10. Declarations and reproducibility
+ Data and ethics: The study uses fictional generated records and no actual customer or employer information.
+ No claim of institutional ethics approval is made. Funding and conflicts: No funding or conflict disclosures
+ have been supplied; the author should confirm these before submission. Author review: This is an AI-assisted
+ working manuscript based on the project repository and verified execution logs; the named author should
+ verify the analyses, references and disclosures before submitting it.
+ Code availability: github.com/samuel6183/project-sentinel. Run the pipeline, advanced, reliability and
+ confirmation modules with Python using the repository requirements. The public code is available; workflow
+ artifacts may require login and expire on 24 February 2027. Archive the outputs and environment versions for
+ durable reproducibility.
+
+
+
+
+
+
+ References
+ Breiman, L. (2001). Random forests. Machine Learning, 45, 5–32. https://doi.org/10.1023/A:1010933404324
+ Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting system. In Proceedings of the 22nd ACM
+ SIGKDD International Conference on Knowledge Discovery and Data Mining (pp. 785–794).
+ https://doi.org/10.1145/2939672.2939785
+ Lundberg, S. M., & Lee, S.-I. (2017). A unified approach to interpreting model predictions. Advances in
+ Neural Information Processing Systems, 30. https://proceedings.neurips.cc/paper_files/paper/2017/hash/8a20a
+ 8621978632d76c43dfd28b67767-Abstract.html
+ Niculescu-Mizil, A., & Caruana, R. (2005). Predicting good probabilities with supervised learning. In
+ Proceedings of the 22nd International Conference on Machine Learning (pp. 625–632).
+ https://doi.org/10.1145/1102351.1102430
+ Saito, T., & Rehmsmeier, M. (2015). The precision-recall plot is more informative than the ROC plot when
+ evaluating binary classifiers on imbalanced datasets. PLOS ONE, 10(3), e0118432.
+ https://doi.org/10.1371/journal.pone.0118432
+
+ Appendix A. Research evidence and reproduction
+ Project Sentinel (2026). GitHub repository and research execution records. The following runs were inspected
+ for the manuscript; each completed successfully.
+ Stage I: workflow 45851888651 | research artifact 15133927853.
+ Stage II: workflow 45852666019 | research artifact 15133963633.
+ Stage III: workflow 45853644658 | research artifact 15134189936.
+ Stage IV: workflow 45854541752 | research artifact 15134992738.
+ Source protocols: V2 methodology; V3 reliability protocol; V4 confirmation protocol.
+ Reproduction commands (from repository root)
+ python -m pip install -r requirements.txt
+
+ python -m unittest discover -s tests -v
+
+ python -m sentinel.pipeline --rows 100000 --seed 42
+
+ python -m sentinel.report
+
+ python -m sentinel.advanced --rows 100000 --seed 42
+
+ python -m sentinel.reliability --rows 100000
+
+ python -m sentinel.confirmation --rows 100000
