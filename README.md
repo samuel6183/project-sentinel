@@ -145,3 +145,13 @@ The model shows limited discrimination and low precision. Threshold 0.5 produces
 ### Download research outputs
 
 [Download the workflow artifact](https://github.com/samuel6183/project-sentinel/actions/runs/45851888651/artifacts/15133927853) (GitHub sign-in may be required; expires 24 February 2027). Contains the generated dataset, SQLite database, metrics, charts, executed notebook and report. Workflow tests, pipeline execution, report generation, notebook execution and artifact upload all succeeded. Metrics above were checked against execution logs, not independently recomputed from the artifact.
+
+## Advanced machine learning methodology (v2)
+
+[Read the evaluation protocol](docs/model_methodology.md). Four model families (Logistic Regression, Random Forest, XGBoost and Isolation Forest) are evaluated with distinct chronological training, calibration, threshold-validation and final-test partitions. The protocol includes engineered pre-outcome features, calibrated risk scores, a hypothetical review-cost objective, an alert-capacity constraint and a no-alert baseline. The earlier results above remain the historical v1 benchmark; new metrics will be reported only after successful execution.
+
+```bash
+python -m sentinel.advanced --rows 100000 --seed 42
+```
+
+Outputs: `outputs/advanced_model_comparison.csv` and `outputs/advanced_model_protocol.json`. This is a simulated experiment, not validated fraud detection.
