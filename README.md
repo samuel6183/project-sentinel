@@ -36,3 +36,9 @@ streamlit run app.py
 Public dashboard hosting is not confirmed. The online paper integrates the principal findings and plots; the original complete manuscript and protocols preserve the full research. Charts use reported simulation outcomes, not new execution. Independent working paper, not peer reviewed.
 
 [Research portfolio](https://github.com/samuel6183)
+
+## Verification status
+
+[![Sentinel tests](https://github.com/samuel6183/project-sentinel/actions/workflows/test.yml/badge.svg)](https://github.com/samuel6183/project-sentinel/actions/workflows/test.yml)
+
+[Latest successful validation inspected on 28 November 2026](https://github.com/samuel6183/project-sentinel/actions/runs/45922729501). This is evidence of automated workflow execution, not independent scientific replication or a verified public deployment.
